@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Globalization;
 using System.Runtime.InteropServices;
 using Dalamud.IoC;
@@ -23,6 +23,7 @@ public sealed class Plugin : IDalamudPlugin
 {
     [PluginService] public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] public static IClientState ClientState { get; private set; } = null!;
+    [PluginService] public static IPlayerState PlayerState { get; private set; } = null!;
     [PluginService] public static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] public static IChatGui Chat { get; private set; } = null!;
     [PluginService] public static IFramework Framework { get; private set; } = null!;
@@ -148,7 +149,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private void TimeTracker(IFramework framework)
     {
-        if (ClientState.LocalPlayer == null)
+        if (!PlayerState.IsLoaded)
             return;
 
         Log.Debug("Checking for player name");
@@ -212,8 +213,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public static string GetLocalPlayerName()
     {
-        var local = ClientState.LocalPlayer;
-        return local?.HomeWorld.ValueNullable == null ? string.Empty : $"{local.Name}\uE05D{local.HomeWorld.Value.Name}";
+        return PlayerState.HomeWorld.ValueNullable == null ? string.Empty : $"{PlayerState.CharacterName}\uE05D{PlayerState.HomeWorld.Value.Name}";
     }
 
     public void ReloadConfig()
